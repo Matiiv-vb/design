@@ -2,6 +2,7 @@ import type { DesignState } from "../type/design";
 import { DesignModel } from "@/model/design-model";
 import { defineStore } from "pinia";
 import { computed, reactive } from "vue";
+import { image, image2, image3 } from "@/assets/image64.ts";
 
 export const useDesignStore = defineStore("design", () => {
   const state = reactive<DesignState>({
@@ -13,7 +14,7 @@ export const useDesignStore = defineStore("design", () => {
         "Ostriv",
         "https://design104.horoshop.ua/",
         false,
-        []
+        [image]
       ),
       new DesignModel(
         2,
@@ -21,7 +22,7 @@ export const useDesignStore = defineStore("design", () => {
         "Flora",
         "https://design104.horoshop.ua/",
         false,
-        []
+        [image3]
       ),
       new DesignModel(
         3,
@@ -29,7 +30,55 @@ export const useDesignStore = defineStore("design", () => {
         "SunWear",
         "https://design104.horoshop.ua/",
         true,
-        ["Ddsfasd", "GDF", "TRT"]
+        [image2, image3]
+      ),
+      new DesignModel(
+        4,
+        "105",
+        "SunWear",
+        "https://design104.horoshop.ua/",
+        true,
+        [image2, image3]
+      ),
+      new DesignModel(
+        5,
+        "105",
+        "SunWear",
+        "https://design104.horoshop.ua/",
+        true,
+        [image2, image3]
+      ),
+      new DesignModel(
+        6,
+        "105",
+        "SunWear",
+        "https://design104.horoshop.ua/",
+        true,
+        [image3, image]
+      ),
+      new DesignModel(
+        7,
+        "105",
+        "SunWear",
+        "https://design104.horoshop.ua/",
+        true,
+        [image, image3]
+      ),
+      new DesignModel(
+        8,
+        "105",
+        "SunWear",
+        "https://design104.horoshop.ua/",
+        true,
+        [image2, image3]
+      ),
+      new DesignModel(
+        9,
+        "105",
+        "SunWear",
+        "https://design104.horoshop.ua/",
+        true,
+        [image, image3]
       ),
     ],
   }) as DesignState;

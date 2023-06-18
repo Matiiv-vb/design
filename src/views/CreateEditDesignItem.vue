@@ -1,26 +1,57 @@
 <template>
-  <back-link route-name="home" />
-  <div v-if="isDelete" @click="remove(design.id)">DELETE</div>
-  <!-- <pre>{{ design }}</pre> -->
-  <images v-model:images="images" @deleteImage="deleteImage"  />
-  <dropzone @updateImages="updateImages" />
-  <input
-    type="text"
-    class="form-control mr-sm-2 mb-2"
-    v-model.trim="design.public_id"
-  />
-  <input
-    type="text"
-    class="form-control mr-sm-2 mb-2"
-    v-model.trim="design.title"
-  />
-  <input
-    type="text"
-    class="form-control mr-sm-2 mb-2"
-    v-model.trim="design.url"
-  />
-
-  <div @click="saveItem" class="home">Зберегти і вийти</div>
+  <div class="edit-design-wrapper">
+    <div class="display-flex">
+      <back-link route-name="home" />
+      <div class="edit-design-main">
+        <div class="edit-design-main-header">
+          <div class="switch-wrap">
+            <Switch v-model:checked="design.publiched" />
+            <div v-if="design.publiched" class="text-success">
+              Опублікований
+            </div>
+            <div v-else>Неопублікований</div>
+          </div>
+          <div class="display-flex">
+            <my-button
+              type="delete"
+              v-if="isDelete"
+              @clicked="remove(design.id)"
+              >Видалити</my-button
+            >
+            <my-button @clicked="saveItem">Зберегти і вийти</my-button>
+          </div>
+        </div>
+        <div class="images-dropzone-wrapper">
+          <images
+            v-if="images.length"
+            v-model:images="images"
+            @deleteImage="deleteImage"
+          />
+          <dropzone
+            :type="images.length ? 'add' : 'empty'"
+            @updateImages="updateImages"
+          />
+        </div>
+        <div class="inputs-wrapper">
+          <input
+            type="text"
+            placeholder="###"
+            v-model.trim="design.public_id"
+          />
+          <input
+            type="text"
+            placeholder="Назва дизайну"
+            v-model.trim="design.title"
+          />
+          <input
+            type="text"
+            placeholder="https://design###.horoshop.ua/"
+            v-model.trim="design.url"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -31,6 +62,8 @@ import { DesignModel } from "@/model/design-model";
 import BackLink from "@/components/BackLink.vue";
 import Dropzone from "@/components/Dropzone.vue";
 import Images from "@/components/Images.vue";
+import Switch from "@/components/UI/Switch.vue";
+import MyButton from "@/components/UI/MyButton.vue";
 
 interface SetupData {
   design: Ref<DesignModel>;
@@ -44,7 +77,7 @@ interface SetupData {
 
 export default defineComponent({
   name: "CreateEditDesignItem",
-  components: { BackLink, Dropzone, Images },
+  components: { BackLink, Dropzone, Images, Switch, MyButton },
 
   setup(): SetupData {
     const route = useRoute();
@@ -94,7 +127,7 @@ export default defineComponent({
     const deleteImage = (inx: number) => {
       images.value.splice(inx, 1);
     };
-    
+
     const updateImages = (image: string) => {
       images.value.push(image);
     };
@@ -126,3 +159,70 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+@import "@/assets/scss/global.scss";
+.edit-design {
+  &-wrapper {
+    display: flex;
+    flex-direction: column;
+    background-color: $color-ligth;
+
+    .inputs-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px 8px;
+      margin-top: 36px;
+      max-width: 600px;
+
+      & input {
+        color: $color-black;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+        padding: 8px 12px;
+      }
+
+      & input:first-child {
+        width: 80px;
+      }
+      & input:nth-child(2) {
+        flex: 1;
+      }
+      & input:nth-child(3) {
+        width: 100%;
+      }
+
+      & input::placeholder {
+        color: rgba(0, 0, 0, 0.2);
+      }
+
+      & input:nth-child(2)::placeholder {
+        text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+      }
+    }
+
+    .images-dropzone-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 10px;
+      margin-top: 40px;
+    }
+
+    .switch-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0px 10px;
+    }
+  }
+
+  &-main {
+    flex: 1;
+    margin-left: 50px;
+
+    &-header {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}
+</style>

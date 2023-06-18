@@ -1,9 +1,7 @@
 <template>
-  <div class="navbar navbar-expand-lg navbar-light bg-light mb-2">
-    <router-link :to="{ name: routeName }" class="btn btn-primary">
-        <img src="@/assets/icons/ArrowLeft.svg" alt="" />
-    </router-link>
-  </div>
+  <router-link :to="{ name: routeName }" class="back-link">
+    <img src="@/assets/icons/ArrowLeft.svg" alt="" />
+  </router-link>
 </template>
 
 <script lang="ts">
@@ -19,3 +17,12 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+@import "@/assets/scss/global.scss";
+.back-link {
+  display: flex;
+  align-self: start;
+  margin-top: 4px;
+}
+</style>

@@ -1,6 +1,5 @@
 <template>
   <div class="list-wrapper">
-    list
     <design-item v-for="design in designs" :item="design" :key="design.id" />
   </div>
 </template>
@@ -29,3 +28,15 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+@import "@/assets/scss/global.scss";
+.list {
+  &-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 10px;
+    margin-top: 10px;
+  }
+}
+</style>

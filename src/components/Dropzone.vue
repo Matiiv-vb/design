@@ -1,11 +1,10 @@
 <template>
-  <div>
-    <div v-bind="getRootProps()">
-      <input v-bind="getInputProps()" />
-      <p v-if="isDragActive">Drop the files here ...</p>
-      <p v-else>Drag 'n' drop some files here, or click to select files</p>
-    </div>
-    <button @click="open">open</button>
+  <div
+    class="dropzone-wrapper"
+    :class="[type, isDragActive ? 'active' : '']"
+    v-bind="getRootProps()"
+  >
+    <input v-bind="getInputProps()" />
   </div>
 </template>
 
@@ -15,6 +14,9 @@ import { useDropzone } from "vue3-dropzone";
 
 export default defineComponent({
   name: "Dropzone",
+  props: {
+    type: String,
+  },
   setup(_, { emit }) {
     let preview: Ref<string[]> = ref([]);
 
@@ -51,3 +53,34 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+@import "@/assets/scss/global.scss";
+.dropzone {
+  &-wrapper {
+    height: 120px;
+    // margin-bottom: 200px;
+    background: $color-ligth;
+    border: 2px dashed rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+
+    &.empty {
+      max-width: 600px;
+      width: 100%;
+      background-image: url("@/assets/icons/_iImage.svg");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    &.add {
+      width: 120px;
+      background-image: url("@/assets/icons/Union.svg");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    &.active {
+      background-color: darken($color-ligth, 5%);
+    }
+  }
+}
+</style>
