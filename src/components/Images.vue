@@ -46,6 +46,9 @@ export default defineComponent({
       display: flex;
       flex-wrap: wrap;
       gap: 10px 10px;
+      @media screen and (max-width: 600px) {
+        justify-content: center;
+      }
     }
 
     .img-preview {

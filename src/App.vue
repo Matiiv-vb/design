@@ -44,6 +44,11 @@ export default defineComponent({
   &__view {
     padding: 24px 30px;
     width: calc(100vw - 100px);
+
+    @media screen and (max-width: 600px) {
+      padding: 24px 10px;
+      width: calc(100vw - 60px);
+    }
   }
 }
 </style>

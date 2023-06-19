@@ -33,6 +33,9 @@ export default defineComponent({
     padding: 24px 30px;
     font-size: $font-size-base;
     color: $color-ligth;
+    @media screen and (max-width: 600px) {
+      padding: 24px 10px;
+    }
   }
   &-header {
     display: flex;

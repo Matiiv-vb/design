@@ -12,10 +12,7 @@
             <div v-else>Неопублікований</div>
           </div>
           <div class="display-flex">
-            <my-button
-              type="delete"
-              v-if="isDelete"
-              @clicked="toggleModal"
+            <my-button type="delete" v-if="isDelete" @clicked="toggleModal"
               >Видалити</my-button
             >
             <my-button @clicked="saveItem">Зберегти і вийти</my-button>
@@ -250,6 +247,9 @@ export default defineComponent({
       flex-wrap: wrap;
       gap: 10px 10px;
       margin-top: 40px;
+      @media screen and (max-width: 600px) {
+        justify-content: center;
+      }
     }
 
     .error {
@@ -267,10 +267,19 @@ export default defineComponent({
   &-main {
     flex: 1;
     margin-left: 50px;
+    @media screen and (max-width: 600px) {
+      margin-left: 10px;
+    }
 
     &-header {
       display: flex;
       justify-content: space-between;
+
+      @media screen and (max-width: 600px) {
+        justify-content: center;
+        flex-wrap: wrap-reverse;
+        gap: 10px;
+      }
     }
   }
 }
