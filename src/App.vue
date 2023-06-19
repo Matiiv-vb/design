@@ -2,16 +2,34 @@
   <div class="app-wrapper">
     <side />
     <router-view class="app-wrapper__view" />
+    <Modal @close="store.toggleModal(false)" :modalActive="store.modalActive">
+      <template v-slot:body> Видалити {{ store.getDesign?.title }}? </template>
+      <template v-slot:button>
+        <my-button type="delete" @clicked="store.removeCurrentDesign"
+          >Видалити</my-button
+        >
+      </template>
+    </Modal>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onBeforeMount } from "vue";
 import Side from "@/components/Side.vue";
+import Modal from "@/components/Modal.vue";
+import { useDesignStore } from "@/store/module/design";
+import MyButton from "@/components/UI/MyButton.vue";
 
 export default defineComponent({
   name: "App",
-  components: { Side },
+  components: { Side, Modal, MyButton },
+  setup() {
+    const store = useDesignStore();
+    onBeforeMount((): void => {
+      store.getDesignsLS();
+    });
+    return { store };
+  },
 });
 </script>
 

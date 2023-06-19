@@ -1,13 +1,42 @@
-import { ref, computed } from "vue";
+import { ref, computed, Ref } from "vue";
 import { DesignModel } from "@/model/design-model";
 import { useDesignStore } from "@/store/module/design";
 
 export default function useDesign() {
   const store = useDesignStore();
+
+  let currentImages: Ref<string[]> = ref([]);
   const newDesignPublicId = ref("");
   const newDesignTitle = ref("");
   const newUrl = ref("");
   const newImages = ref([]);
+
+  let currentDesign = ref(
+    new DesignModel(
+      0,
+      newDesignPublicId.value,
+      newDesignTitle.value,
+      newUrl.value,
+      false,
+      newImages.value
+    ) as DesignModel
+  );
+
+  const deleteImage = (inx: number) => {
+    currentImages.value.splice(inx, 1);
+  };
+
+  const updateImages = (image: string) => {
+    currentImages.value.push(image);
+  };
+
+  const setCurrentDesign = (design: DesignModel) => {
+    currentDesign.value = design;
+  };
+
+  const toggleModal = () => {
+    store.toggleModal(true);
+  };
 
   const designs = computed(() => store.getDesigns);
 
@@ -21,37 +50,16 @@ export default function useDesign() {
   };
 
   const addDesign = (designObject: DesignModel): void => {
-    // const title = newDesignTitle.value && newDesignTitle.value.trim();
-    // const publicId = newDesignPublicId.value && newDesignPublicId.value.trim();
-    // const url = newUrl.value && newUrl.value.trim();
-    // console.log("ADDDSD", title);
-    // if (!title) {
-    //   return;
-    // }
-
-    // const payload = new DesignModel(
-    //   getNewId(),
-    //   publicId,
-    //   title,
-    //   url,
-    //   false,
-    //   []
-    // );
     designObject.id = getNewId();
-
     store.addDesign(designObject);
-
-    // newDesignPublicId.value = "";
-    // newDesignTitle.value = "";
-    // newUrl.value = "";
   };
 
   const removeDesign = (id: number): void => {
     store.removeDesign(id);
   };
 
-  const updateDesign = (todo: DesignModel): void => {
-    store.updateDesign(todo);
+  const updateDesign = (design: DesignModel): void => {
+    store.updateDesign(design);
   };
 
   const updateDesignPubliched = (id: number, publiched: boolean): void => {
@@ -69,6 +77,23 @@ export default function useDesign() {
     return design;
   };
 
+  //validation
+  let saveCliked = ref(false);
+
+  const isValidId = computed(
+    () => currentDesign.value.public_id.length > 0 || !saveCliked.value
+  );
+  const isValidTitle = computed(
+    () => currentDesign.value.title.length > 0 || !saveCliked.value
+  );
+  const isValidUrl = computed(
+    () => currentDesign.value.url.length > 0 || !saveCliked.value
+  );
+  const isValidIdImages = computed(
+    () => currentDesign.value.images.length > 0 || !saveCliked.value
+  );
+  //
+
   return {
     addDesign,
     newDesignPublicId,
@@ -81,5 +106,16 @@ export default function useDesign() {
     designs,
     getDesignById,
     getNewId,
+    toggleModal,
+    currentDesign,
+    setCurrentDesign,
+    currentImages,
+    deleteImage,
+    updateImages,
+    isValidId,
+    isValidTitle,
+    isValidUrl,
+    isValidIdImages,
+    saveCliked,
   };
 }

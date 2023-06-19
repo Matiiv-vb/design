@@ -5,8 +5,8 @@
       <div class="edit-design-main">
         <div class="edit-design-main-header">
           <div class="switch-wrap">
-            <Switch v-model:checked="design.publiched" />
-            <div v-if="design.publiched" class="text-success">
+            <Switch v-model:checked="currentDesign.publiched" />
+            <div v-if="currentDesign.publiched" class="text-success">
               Опублікований
             </div>
             <div v-else>Неопублікований</div>
@@ -15,7 +15,7 @@
             <my-button
               type="delete"
               v-if="isDelete"
-              @clicked="remove(design.id)"
+              @clicked="toggleModal"
               >Видалити</my-button
             >
             <my-button @clicked="saveItem">Зберегти і вийти</my-button>
@@ -23,20 +23,20 @@
         </div>
         <div class="images-dropzone-wrapper">
           <images
-            v-if="images.length"
-            v-model:images="images"
+            v-if="currentImages.length"
+            v-model:images="currentImages"
             @deleteImage="deleteImage"
           />
           <div
             class="dropzone-wrapper"
-            :class="images.length ? 'add' : 'empty'"
+            :class="currentImages.length ? 'add' : 'empty'"
           >
             <dropzone
-              :type="images.length ? 'add' : 'empty'"
+              :type="currentImages.length ? 'add' : 'empty'"
               @updateImages="updateImages"
             />
             <div v-if="!isValidIdImages" class="error">
-              Обов'язкове поле Фото
+              Обов'язкове поле: Фото
             </div>
           </div>
         </div>
@@ -46,7 +46,7 @@
             <input
               type="text"
               placeholder="###"
-              v-model.trim="design.public_id"
+              v-model.trim="currentDesign.public_id"
             />
             <div v-if="!isValidId" class="error">Обов'язкове поле</div>
           </div>
@@ -55,17 +55,19 @@
             <input
               type="text"
               placeholder="Назва дизайну"
-              v-model.trim="design.title"
+              v-model.trim="currentDesign.title"
             />
-            <div v-if="!isValidTitle" class="error">Обов'язкове поле Title</div>
+            <div v-if="!isValidTitle" class="error">
+              Обов'язкове поле: Title
+            </div>
           </div>
           <div class="input-wrapper">
             <input
               type="text"
               placeholder="https://design###.horoshop.ua/"
-              v-model.trim="design.url"
+              v-model.trim="currentDesign.url"
             />
-            <div v-if="!isValidUrl" class="error">Обов'язкове поле Url</div>
+            <div v-if="!isValidUrl" class="error">Обов'язкове поле: Url</div>
           </div>
         </div>
       </div>
@@ -74,14 +76,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  onBeforeMount,
-  Ref,
-  ref,
-  computed,
-  ComputedRef,
-} from "vue";
+import { defineComponent, onBeforeMount, Ref, ref, ComputedRef } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import useDesign from "@/hooks/useDesigns";
 import { DesignModel } from "@/model/design-model";
@@ -92,17 +87,17 @@ import Switch from "@/components/UI/Switch.vue";
 import MyButton from "@/components/UI/MyButton.vue";
 
 interface SetupData {
-  design: Ref<DesignModel>;
+  currentDesign: Ref<DesignModel>;
   saveItem: () => void;
   deleteImage: (inx: number) => void;
   updateImages: (image: string) => void;
-  images: Ref<string[]>;
+  currentImages: Ref<string[]>;
   isDelete: Ref<boolean>;
-  remove: (id: number) => void;
   isValidId: ComputedRef<boolean>;
   isValidTitle: ComputedRef<boolean>;
   isValidUrl: ComputedRef<boolean>;
   isValidIdImages: ComputedRef<boolean>;
+  toggleModal: () => void;
 }
 
 export default defineComponent({
@@ -118,7 +113,6 @@ export default defineComponent({
   setup(): SetupData {
     const route = useRoute();
     const router = useRouter();
-    let images: Ref<string[]> = ref([]);
     let isDelete: Ref<boolean> = ref(false);
     const {
       getDesignById,
@@ -129,62 +123,53 @@ export default defineComponent({
       updateDesign,
       addDesign,
       getNewId,
-      removeDesign,
+      currentDesign,
+      setCurrentDesign,
+      currentImages,
+      deleteImage,
+      updateImages,
+      isValidId,
+      isValidTitle,
+      isValidUrl,
+      isValidIdImages,
+      saveCliked,
+      toggleModal,
     } = useDesign();
-
-    let design = ref({} as DesignModel);
-    let saveCliked = ref(false);
 
     onBeforeMount((): void => {
       if (route.name === "edit_design" && route.params.id) {
         const existDesign = getDesignById(Number(route.params["id"]));
 
-        design.value = new DesignModel(
-          existDesign.id,
-          existDesign.public_id,
-          existDesign.title,
-          existDesign.url,
-          existDesign.publiched,
-          existDesign.images
+        setCurrentDesign(
+          new DesignModel(
+            existDesign.id,
+            existDesign.public_id,
+            existDesign.title,
+            existDesign.url,
+            existDesign.publiched,
+            existDesign.images
+          )
         );
-        images.value = [...existDesign.images];
+
+        currentImages.value = [...existDesign.images];
         isDelete.value = true;
       } else {
-        design.value = new DesignModel(
-          getNewId(),
-          newDesignPublicId.value,
-          newDesignTitle.value,
-          newUrl.value,
-          false,
-          newImages.value
+        setCurrentDesign(
+          new DesignModel(
+            getNewId(),
+            newDesignPublicId.value,
+            newDesignTitle.value,
+            newUrl.value,
+            false,
+            newImages.value
+          )
         );
       }
     });
 
-    const deleteImage = (inx: number) => {
-      images.value.splice(inx, 1);
-    };
-
-    const updateImages = (image: string) => {
-      images.value.push(image);
-    };
-
-    const isValidId = computed(
-      () => design.value.public_id.length > 0 || !saveCliked.value
-    );
-    const isValidTitle = computed(
-      () => design.value.title.length > 0 || !saveCliked.value
-    );
-    const isValidUrl = computed(
-      () => design.value.url.length > 0 || !saveCliked.value
-    );
-    const isValidIdImages = computed(
-      () => design.value.images.length > 0 || !saveCliked.value
-    );
-
     const saveItem = () => {
       saveCliked.value = true;
-      design.value.images = images.value;
+      currentDesign.value.images = currentImages.value;
 
       if (
         isValidId.value &&
@@ -193,31 +178,26 @@ export default defineComponent({
         isValidIdImages.value
       ) {
         if (route.name === "edit_design" && route.params.id) {
-          updateDesign(design.value);
+          updateDesign(currentDesign.value);
         } else {
-          addDesign(design.value);
+          addDesign(currentDesign.value);
         }
         router.push({ name: "home" });
       }
     };
 
-    const remove = (id: number) => {
-      removeDesign(id);
-      router.push({ name: "home" });
-    };
-
     return {
-      design,
+      currentDesign,
       saveItem,
       deleteImage,
       updateImages,
-      images,
+      currentImages,
       isDelete,
-      remove,
       isValidId,
       isValidTitle,
       isValidUrl,
       isValidIdImages,
+      toggleModal,
     };
   },
 });
@@ -294,7 +274,6 @@ export default defineComponent({
     }
   }
 }
-
 .dropzone-wrapper:not(.add) {
   width: 100%;
   .error {
