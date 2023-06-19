@@ -27,27 +27,46 @@
             v-model:images="images"
             @deleteImage="deleteImage"
           />
-          <dropzone
-            :type="images.length ? 'add' : 'empty'"
-            @updateImages="updateImages"
-          />
+          <div
+            class="dropzone-wrapper"
+            :class="images.length ? 'add' : 'empty'"
+          >
+            <dropzone
+              :type="images.length ? 'add' : 'empty'"
+              @updateImages="updateImages"
+            />
+            <div v-if="!isValidIdImages" class="error">
+              Обов'язкове поле Фото
+            </div>
+          </div>
         </div>
+
         <div class="inputs-wrapper">
-          <input
-            type="text"
-            placeholder="###"
-            v-model.trim="design.public_id"
-          />
-          <input
-            type="text"
-            placeholder="Назва дизайну"
-            v-model.trim="design.title"
-          />
-          <input
-            type="text"
-            placeholder="https://design###.horoshop.ua/"
-            v-model.trim="design.url"
-          />
+          <div class="input-wrapper">
+            <input
+              type="text"
+              placeholder="###"
+              v-model.trim="design.public_id"
+            />
+            <div v-if="!isValidId" class="error">Обов'язкове поле</div>
+          </div>
+
+          <div class="input-wrapper">
+            <input
+              type="text"
+              placeholder="Назва дизайну"
+              v-model.trim="design.title"
+            />
+            <div v-if="!isValidTitle" class="error">Обов'язкове поле Title</div>
+          </div>
+          <div class="input-wrapper">
+            <input
+              type="text"
+              placeholder="https://design###.horoshop.ua/"
+              v-model.trim="design.url"
+            />
+            <div v-if="!isValidUrl" class="error">Обов'язкове поле Url</div>
+          </div>
         </div>
       </div>
     </div>
@@ -55,7 +74,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, Ref, ref } from "vue";
+import {
+  defineComponent,
+  onBeforeMount,
+  Ref,
+  ref,
+  computed,
+  ComputedRef,
+} from "vue";
 import { useRoute, useRouter } from "vue-router";
 import useDesign from "@/hooks/useDesigns";
 import { DesignModel } from "@/model/design-model";
@@ -73,11 +99,21 @@ interface SetupData {
   images: Ref<string[]>;
   isDelete: Ref<boolean>;
   remove: (id: number) => void;
+  isValidId: ComputedRef<boolean>;
+  isValidTitle: ComputedRef<boolean>;
+  isValidUrl: ComputedRef<boolean>;
+  isValidIdImages: ComputedRef<boolean>;
 }
 
 export default defineComponent({
   name: "CreateEditDesignItem",
-  components: { BackLink, Dropzone, Images, Switch, MyButton },
+  components: {
+    BackLink,
+    Dropzone,
+    Images,
+    Switch,
+    MyButton,
+  },
 
   setup(): SetupData {
     const route = useRoute();
@@ -97,6 +133,7 @@ export default defineComponent({
     } = useDesign();
 
     let design = ref({} as DesignModel);
+    let saveCliked = ref(false);
 
     onBeforeMount((): void => {
       if (route.name === "edit_design" && route.params.id) {
@@ -132,14 +169,36 @@ export default defineComponent({
       images.value.push(image);
     };
 
+    const isValidId = computed(
+      () => design.value.public_id.length > 0 || !saveCliked.value
+    );
+    const isValidTitle = computed(
+      () => design.value.title.length > 0 || !saveCliked.value
+    );
+    const isValidUrl = computed(
+      () => design.value.url.length > 0 || !saveCliked.value
+    );
+    const isValidIdImages = computed(
+      () => design.value.images.length > 0 || !saveCliked.value
+    );
+
     const saveItem = () => {
+      saveCliked.value = true;
       design.value.images = images.value;
-      if (route.name === "edit_design" && route.params.id) {
-        updateDesign(design.value);
-      } else {
-        addDesign(design.value);
+
+      if (
+        isValidId.value &&
+        isValidTitle.value &&
+        isValidUrl.value &&
+        isValidIdImages.value
+      ) {
+        if (route.name === "edit_design" && route.params.id) {
+          updateDesign(design.value);
+        } else {
+          addDesign(design.value);
+        }
+        router.push({ name: "home" });
       }
-      router.push({ name: "home" });
     };
 
     const remove = (id: number) => {
@@ -155,6 +214,10 @@ export default defineComponent({
       images,
       isDelete,
       remove,
+      isValidId,
+      isValidTitle,
+      isValidUrl,
+      isValidIdImages,
     };
   },
 });
@@ -180,23 +243,24 @@ export default defineComponent({
         border: 1px solid rgba(0, 0, 0, 0.2);
         border-radius: 3px;
         padding: 8px 12px;
+        width: -webkit-fill-available;
       }
 
-      & input:first-child {
+      & .input-wrapper:first-child {
         width: 80px;
       }
-      & input:nth-child(2) {
+      & .input-wrapper:nth-child(2) {
         flex: 1;
       }
-      & input:nth-child(3) {
+      & .input-wrapper:nth-child(3) {
         width: 100%;
       }
 
-      & input::placeholder {
+      & .input-wrapper input::placeholder {
         color: rgba(0, 0, 0, 0.2);
       }
 
-      & input:nth-child(2)::placeholder {
+      & .input-wrapper:nth-child(2) input::placeholder {
         text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
       }
     }
@@ -206,6 +270,11 @@ export default defineComponent({
       flex-wrap: wrap;
       gap: 10px 10px;
       margin-top: 40px;
+    }
+
+    .error {
+      font-size: 12px;
+      color: red;
     }
 
     .switch-wrap {
@@ -223,6 +292,13 @@ export default defineComponent({
       display: flex;
       justify-content: space-between;
     }
+  }
+}
+
+.dropzone-wrapper:not(.add) {
+  width: 100%;
+  .error {
+    max-width: 600px;
   }
 }
 </style>

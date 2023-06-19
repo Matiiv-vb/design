@@ -81,7 +81,7 @@ input:checked + .slider:before {
 }
 
 .slider.round {
-  border-radius: 17px;
+  border-radius: 14px;
 }
 
 .slider.round:before {

@@ -49,6 +49,12 @@ export default defineComponent({
     }
 
     .img-preview {
+      background: linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.3),
+        rgba(255, 255, 255, 0.3)
+      );
+      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
       border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 3px;
       width: 120px;

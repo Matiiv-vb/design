@@ -1,6 +1,6 @@
 <template>
   <div
-    class="dropzone-wrapper"
+    class="dropzone"
     :class="[type, isDragActive ? 'active' : '']"
     v-bind="getRootProps()"
   >
@@ -57,30 +57,27 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import "@/assets/scss/global.scss";
 .dropzone {
-  &-wrapper {
-    height: 120px;
-    // margin-bottom: 200px;
-    background: $color-ligth;
-    border: 2px dashed rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
+  height: 120px;
+  background: $color-ligth;
+  border: 2px dashed rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
 
-    &.empty {
-      max-width: 600px;
-      width: 100%;
-      background-image: url("@/assets/icons/_iImage.svg");
-      background-repeat: no-repeat;
-      background-position: center;
-    }
-    &.add {
-      width: 120px;
-      background-image: url("@/assets/icons/Union.svg");
-      background-repeat: no-repeat;
-      background-position: center;
-    }
+  &.empty {
+    max-width: 600px;
+    width: 100%;
+    background-image: url("@/assets/icons/_iImage.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  &.add {
+    width: 120px;
+    background-image: url("@/assets/icons/Union.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+  }
 
-    &.active {
-      background-color: darken($color-ligth, 5%);
-    }
+  &.active {
+    background-color: darken($color-ligth, 5%);
   }
 }
 </style>
